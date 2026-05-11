@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VAULT — Digital Wallet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">VAULT</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="switchPage('dashboard')">Dashboard</button>
+    <button class="nav-tab" onclick="switchPage('income-page')">Pemasukan</button>
+    <button class="nav-tab" onclick="switchPage('expense-page')">Pengeluaran</button>
+    <button class="nav-tab" onclick="switchPage('wallets-page')">Saldo E-Wallet</button>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-icon" onclick="exportJSON()">&#8595; Export</button>
+    <label class="btn-icon import-label">
+      &#8593; Import
+      <input type="file" id="file-import" accept=".json" onchange="importJSON(event)">
+    </label>
+  </div>
+</nav>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboard" class="page active">
+  <div class="hero">
+    <div class="hero-label">Total Saldo Keseluruhan</div>
+    <div class="hero-balance">
+      <span class="currency">Rp</span>
+      <span id="db-balance">0</span>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-card">
+        <div class="stat-dot income">💚</div>
+        <div>
+          <div class="stat-label">Pemasukan</div>
+          <div class="stat-value income" id="db-income">Rp 0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-dot expense">❤️</div>
+        <div>
+          <div class="stat-label">Pengeluaran</div>
+          <div class="stat-value expense" id="db-expense">Rp 0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <button class="cta-btn income-btn" onclick="openModal('income')">
+      <div class="cta-icon green">＋</div>
+      <div>
+        <div class="cta-text-title">Tambah Pemasukan</div>
+        <div class="cta-text-sub">Masukkan uang masuk</div>
+      </div>
+    </button>
+    <button class="cta-btn expense-btn" onclick="openModal('expense')">
+      <div class="cta-icon red">−</div>
+      <div>
+        <div class="cta-text-title">Catat Pengeluaran</div>
+        <div class="cta-text-sub">Bayar / belanja</div>
+      </div>
+    </button>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">Semua Transaksi</div>
+    <div class="filter-tabs" style="margin-bottom:0">
+      <button class="filter-tab active" onclick="setFilter('all',this)">Semua</button>
+      <button class="filter-tab" onclick="setFilter('income',this)">Masuk</button>
+      <button class="filter-tab" onclick="setFilter('expense',this)">Keluar</button>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search-input" placeholder="Cari transaksi, deskripsi, atau e-wallet..." oninput="renderAll()">
+  </div>
+
+  <div class="tx-list" id="tx-all"></div>
+</div>
+
+<!-- ===== PEMASUKAN PAGE ===== -->
+<div id="income-page" class="page income-page">
+  <div class="hero" style="border-color: rgba(34,201,122,0.2)">
+    <div class="hero-label">Total Pemasukan</div>
+    <div class="hero-balance income-accent">
+      <span class="currency" style="color:var(--green)">Rp</span>
+      <span id="inc-total">0</span>
+    </div>
+    <div style="font-size:12px; color:var(--text-400); margin-top:6px; font-family:var(--font-mono)">
+      <span id="inc-count">0</span> transaksi tercatat
+    </div>
+  </div>
+
+  <button class="cta-btn income-btn" style="width:100%; margin-bottom:20px" onclick="openModal('income')">
+    <div class="cta-icon green">＋</div>
+    <div>
+      <div class="cta-text-title">Tambah Pemasukan Baru</div>
+      <div class="cta-text-sub">Gaji, kiriman, penjualan, dll</div>
+    </div>
+  </button>
+
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search-income" placeholder="Cari pemasukan..." oninput="renderAll()">
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">Riwayat Pemasukan</div>
+  </div>
+
+  <div class="tx-list" id="tx-income"></div>
+</div>
+
+<!-- ===== PENGELUARAN PAGE ===== -->
+<div id="expense-page" class="page expense-page">
+  <div class="hero" style="border-color: rgba(232,75,75,0.2)">
+    <div class="hero-label">Total Pengeluaran</div>
+    <div class="hero-balance expense-accent">
+      <span class="currency" style="color:var(--red)">Rp</span>
+      <span id="exp-total">0</span>
+    </div>
+    <div style="font-size:12px; color:var(--text-400); margin-top:6px; font-family:var(--font-mono)">
+      <span id="exp-count">0</span> transaksi tercatat
+    </div>
+  </div>
+
+  <button class="cta-btn expense-btn" style="width:100%; margin-bottom:20px" onclick="openModal('expense')">
+    <div class="cta-icon red">−</div>
+    <div>
+      <div class="cta-text-title">Catat Pengeluaran Baru</div>
+      <div class="cta-text-sub">Bayar tagihan, belanja, transfer</div>
+    </div>
+  </button>
+
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search-expense" placeholder="Cari pengeluaran..." oninput="renderAll()">
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">Riwayat Pengeluaran</div>
+  </div>
+
+  <div class="tx-list" id="tx-expense"></div>
+</div>
+
+<!-- ===== E-WALLET PAGE ===== -->
+<div id="wallets-page" class="page">
+  <div class="hero">
+    <div class="hero-label">Pantau Saldo E-Wallet &amp; Bank</div>
+    <div class="hero-balance">
+      <span class="currency">Rp</span>
+      <span id="wallet-total">0</span>
+    </div>
+    <div style="font-size:12px; color:var(--text-400); margin-top:6px; font-family:var(--font-mono)">
+      Total dari semua platform payment
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">Platform Payment</div>
+  </div>
+
+  <div class="wallet-cards" id="wallet-cards"></div>
+
+  <div class="section-header">
+    <div class="section-title">Transaksi Per Platform</div>
+    <div style="display:flex;gap:8px">
+      <select class="form-select" id="wallet-filter" onchange="renderWalletTx()" style="width:auto;padding:6px 12px;font-size:12px">
+        <option value="">Semua Platform</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tx-list" id="wallet-tx-list"></div>
+</div>
+
+<!-- ===== MODAL ADD TRANSACTION ===== -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">TAMBAH TRANSAKSI</div>
+    <div class="modal-sub" id="modal-sub">Isi detail transaksi di bawah</div>
+
+    <div class="form-row">
+      <label class="form-label">Deskripsi</label>
+      <input class="form-input" id="f-desc" placeholder="Keterangan transaksi..." type="text">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Jumlah (Rp)</label>
+      <input class="form-input" id="f-amount" placeholder="0" type="number" min="0">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Tanggal</label>
+      <input class="form-input" id="f-date" type="date">
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Platform / Dompet</label>
+      <div class="wallet-grid" id="wallet-selector"></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Batal</button>
+      <button class="btn-primary" id="modal-btn" onclick="submitTransaction()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

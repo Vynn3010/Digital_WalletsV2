@@ -1,0 +1,11 @@
+[
+  { "id": "dana",      "name": "DANA",       "icon": "💙", "type": "E-Wallet" },
+  { "id": "gopay",     "name": "GoPay",      "icon": "🟢", "type": "E-Wallet" },
+  { "id": "ovo",       "name": "OVO",        "icon": "💜", "type": "E-Wallet" },
+  { "id": "shopeepay", "name": "ShopeePay",  "icon": "🟠", "type": "E-Wallet" },
+  { "id": "jago",      "name": "Jago",       "icon": "🐉", "type": "Bank" },
+  { "id": "bri",       "name": "BRI",        "icon": "🏦", "type": "Bank" },
+  { "id": "cash",      "name": "Cash",       "icon": "💵", "type": "Tunai" },
+  { "id": "qris",      "name": "QRIS Order", "icon": "📱", "type": "QRIS" },
+  { "id": "kuota",     "name": "Kuota",      "icon": "📡", "type": "Paket Data" }
+]
